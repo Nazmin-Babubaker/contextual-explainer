@@ -15,7 +15,8 @@
  
   "permissions": [
     "contextMenus", 
-    "sidePanel"     
+    "sidePanel",
+    "activeTab"     
   ],
 
   
