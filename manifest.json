@@ -5,10 +5,7 @@
   "version": "1.0",
   "description": "Select text and get a simplified explanation in the side panel.",
   
-  
-  "icons": {
-    "16": "images/icon-16.png" 
-  },
+
   
   
   "background": {
