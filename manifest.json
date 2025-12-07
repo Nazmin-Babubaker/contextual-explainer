@@ -22,5 +22,9 @@
   
   "side_panel": {
     "default_path": "panel.html"
-  }
+  },
+
+  "host_permissions": [
+   "https://generativelanguage.googleapis.com/"
+  ]
 }

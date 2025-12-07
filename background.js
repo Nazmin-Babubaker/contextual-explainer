@@ -5,7 +5,7 @@ chrome.runtime.onInstalled.addListener(() =>{
         title: "Simplify & Explain",
         contexts: ["selection"]
     },() => {
-    // Error check
+    
     if (chrome.runtime.lastError) {
       console.error("Context Menu Error:", chrome.runtime.lastError.message);
     }
@@ -17,6 +17,9 @@ chrome.runtime.onInstalled.addListener(() =>{
     });
 
 });
+
+
+
 
 chrome.contextMenus.onClicked.addListener(async(info, tab)=>{
     if(info.menuItemId === "simplify-explain" ){
