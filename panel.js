@@ -2,7 +2,10 @@ chrome.runtime.sendMessage({ type: "PANEL_READY" });
 const explanationTextElement = document.getElementById('explanation-text');
 
 function displayExplanation(text) {
-  explanationTextElement.textContent = text;
+  console.log("📝 Raw text to format:", text);
+
+  const html = marked.parse(text);  // Convert markdown to HTML
+  explanationTextElement.innerHTML = html;
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {

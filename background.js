@@ -17,6 +17,7 @@ chrome.runtime.onInstalled.addListener(() =>{
 });
 
 
+
 let pendingText = null;
 
 async function callGeminiAPI(text) {
@@ -86,6 +87,7 @@ chrome.runtime.onMessage.addListener(async(message, sender, sendResponse) => {
     if (pendingText) {
       console.log("🤖 Calling API after panel ready");
       const explanation = await callGeminiAPI(pendingText);
+      
 
       chrome.runtime.sendMessage({
         type: "EXPLANATION_RECEIVED",
