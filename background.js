@@ -23,27 +23,14 @@ let pendingText = null;
 async function callGeminiAPI(text) {
   console.log("🤖 Calling Gemini API with:", text);
 
-  const apiKey = "key"; 
 
   try {
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `You are a helpful teaching assistant. Provide a simple, concise, and easy-to-understand explanation for the following text. Format the response clearly with paragraphs and bullet points if necessary. Text to simplify: "${text}"`
-                }
-              ]
-            }
-          ]
-        })
-      }
-    );
+   const response = await fetch("http://localhost:3000/explain", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({text: `You are a helpful teaching assistant. Provide a simple, concise, and easy-to-understand explanation for the following text. Format the response clearly with paragraphs and bullet points if necessary. Text to simplify: "${text}"`
+ })
+});
 
     const data = await response.json();
     console.log("📦 Gemini Response:", data);
@@ -70,6 +57,18 @@ chrome.contextMenus.onClicked.addListener(async(info, tab)=>{
             console.log("Selected text:", selectedText);
             pendingText = selectedText;
             await chrome.sidePanel.open({ windowId: tab.windowId });
+
+            chrome.runtime.sendMessage({
+               type: "EXPLANATION_RECEIVED",
+               data: "⏳ Simplifying… Please wait..."
+            });
+
+            const explanation = await callGeminiAPI(selectedText);
+
+            chrome.runtime.sendMessage({
+               type: "EXPLANATION_RECEIVED",
+               data: explanation
+           });
         }else {
             console.error("No text selected.");
         }
