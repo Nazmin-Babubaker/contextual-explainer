@@ -25,7 +25,7 @@ async function callGeminiAPI(text) {
 
 
   try {
-   const response = await fetch("http://localhost:3000/explain", {
+   const response = await fetch("https://gproxyserver.onrender.com/explain", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({text: `You are a helpful teaching assistant. Provide a simple, concise, and easy-to-understand explanation for the following text. Format the response clearly with paragraphs and bullet points if necessary. Text to simplify: "${text}"`
