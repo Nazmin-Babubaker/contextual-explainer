@@ -2,57 +2,84 @@
 <html>
 <head>
   <title>Contextual Explainer Panel</title>
+
   <style>
-   
     body {
-      font-family: sans-serif;
-      margin: 10px;
-      padding: 0;
-      background-color: #f7f7f7;
-      color: #333;
-    }
-    #explanation-container {
+      font-family: "Inter", sans-serif;
+      margin: 0;
       padding: 15px;
-      border-radius: 8px;
-      background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      background: #0e0d0d;
+      color: #e6e6e6;
     }
+
+    #explanation-container {
+      padding: 18px;
+      border-radius: 14px;
+      background: #2d314c;
+      border: 1px solid #2a2a2a;
+      box-shadow: 0 0 12px rgba(120, 80, 255, 0.15);
+      transition: all 0.3s ease;
+    }
+
+    #explanation-container:hover {
+      border-color: #00d9ff;
+      box-shadow: 0 0 18px rgba(17, 2, 78, 0.25);
+    }
+
+    #explanation-container h3 {
+     font-family:sans-serif;
+     font-weight: 700;  
+     font-size: 20px;
+     margin-bottom: 10px;
+     letter-spacing: 1px;
+     color: #e6e6e6;  
+    }
+    
    
+
     h1, h2, h3 {
-  color: #222;
-  margin: 8px 0;
-}
+      color: #cfcfcf;
+      margin: 0 0 12px 0;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+    }
 
-p {
-  font-size: 15px;
-  line-height: 1.5;
-}
+    p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #d0d0d0;
+      margin: 8px 0;
+    }
 
-ul {
-  padding-left: 20px;
-}
+    ul {
+      padding-left: 18px;
+    }
 
-li {
-  margin: 4px 0;
-}
+    li {
+      margin: 6px 0;
+    }
 
-strong {
-  font-weight: bold;
-}
-em {
-  font-style: italic;
-}
+    strong {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    em {
+      color: #e19bff;
+    }
   </style>
+
 </head>
+
 <body>
   <div id="explanation-container">
-    <h3>🔍 Explanation</h3>
+    <div id="e2"><h3>Explanation</h3></div>
     <p id="explanation-text">
       Select any text on the page, right-click, and choose 'Simplify Selection' to get an explanation here.
     </p>
   </div>
-<script src="lib/marked.min.js"></script>
 
+  <script src="lib/marked.min.js"></script>
   <script src="panel.js"></script>
 </body>
 </html>

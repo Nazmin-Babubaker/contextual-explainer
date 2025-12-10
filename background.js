@@ -64,7 +64,7 @@ chrome.contextMenus.onClicked.addListener(async(info, tab)=>{
                type: "EXPLANATION_RECEIVED",
                data: "⏳ Simplifying… Please wait..."
             });
-            
+
             pendingExplanation = "⏳ Simplifying… Please wait...";
             const explanation = await callGeminiAPI(selectedText);
             pendingExplanation = explanation;
@@ -82,12 +82,13 @@ chrome.contextMenus.onClicked.addListener(async(info, tab)=>{
 chrome.runtime.onMessage.addListener(async(message, sender, sendResponse) => {
   if (message.type === "PANEL_READY") {
 
-     chrome.runtime.sendMessage({
+    
+
+    if (pendingText) {
+       chrome.runtime.sendMessage({
         type: "EXPLANATION_RECEIVED",
         data: "⏳ Simplifying… Please wait..."
       });
-
-    if (pendingText) {
       console.log("🤖 Calling API after panel ready");
       const explanation = await callGeminiAPI(pendingText);
       
