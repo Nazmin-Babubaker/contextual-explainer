@@ -19,6 +19,8 @@ chrome.runtime.onInstalled.addListener(() =>{
 
 
 let pendingText = null;
+let pendingExplanation = null;
+
 
 async function callGeminiAPI(text) {
   console.log("🤖 Calling Gemini API with:", text);
@@ -36,8 +38,7 @@ async function callGeminiAPI(text) {
     console.log("📦 Gemini Response:", data);
 
     const output =
-      data.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "⚠️ No explanation returned by Gemini";
+      data.candidates?.[0]?.content?.parts?.[0]?.text || "loading ...";
 
     return output;
   } catch (error) {
@@ -56,14 +57,17 @@ chrome.contextMenus.onClicked.addListener(async(info, tab)=>{
         if(selectedText){
             console.log("Selected text:", selectedText);
             pendingText = selectedText;
+
             await chrome.sidePanel.open({ windowId: tab.windowId });
 
             chrome.runtime.sendMessage({
                type: "EXPLANATION_RECEIVED",
                data: "⏳ Simplifying… Please wait..."
             });
-
+            
+            pendingExplanation = "⏳ Simplifying… Please wait...";
             const explanation = await callGeminiAPI(selectedText);
+            pendingExplanation = explanation;
 
             chrome.runtime.sendMessage({
                type: "EXPLANATION_RECEIVED",
