@@ -6,7 +6,10 @@
   "description": "Select text and get a simplified explanation in the side panel.",
   
 
-  
+  "icons": {
+    "16": "pen-tablet.png",
+    "48": "pen-tablet.png"
+  },
   
   "background": {
     "service_worker": "background.js"
