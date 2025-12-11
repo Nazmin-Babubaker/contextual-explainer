@@ -67,6 +67,58 @@
     em {
       color: #e19bff;
     }
+
+    /* Loader animation */
+  #loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 25px auto;
+}
+
+
+.loader {
+  width: 40px;
+  aspect-ratio: 1;
+  position: relative;
+}
+
+.loader:before,
+.loader:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: -8px 0 0 -8px;
+  width: 16px;
+  aspect-ratio: 1;
+  background: #55b7d2;
+  animation:
+    l2-1 2s infinite,
+    l2-2 1s infinite;
+}
+
+.loader:after {
+  background: #d01e59;
+  animation-delay: -1s, 0s;
+}
+
+@keyframes l2-1 {
+  0%   { top: 0;   left: 0; }
+  25%  { top: 100%; left: 0; }
+  50%  { top: 100%; left: 100%; }
+  75%  { top: 0;   left: 100%; }
+  100% { top: 0;   left: 0; }
+}
+
+@keyframes l2-2 {
+  40%,50% { transform: rotate(0.25turn) scale(0.5); }
+  100%    { transform: rotate(0.5turn) scale(1); }
+}
+
+.hidden {
+  display: none !important;
+}
   </style>
 
 </head>
@@ -74,6 +126,9 @@
 <body>
   <div id="explanation-container">
     <div id="e2"><h3>Explanation</h3></div>
+
+    <div id="loader" class="loader hidden"></div>
+
     <p id="explanation-text">
       Select any text on the page, right-click, and choose 'Simplify Selection' to get an explanation here.
     </p>
