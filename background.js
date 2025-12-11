@@ -23,27 +23,22 @@ let pendingExplanation = null;
 
 
 async function callGeminiAPI(text) {
-  console.log("🤖 Calling Gemini API with:", text);
-
+  console.log("🤖 Calling Groq API with:", text);
 
   try {
-   const response = await fetch("https://gproxyserver.onrender.com/explain", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({text: `You are a helpful teaching assistant. Provide a simple, concise, and easy-to-understand explanation for the following text. Format the response clearly with paragraphs and bullet points if necessary. Text to simplify: "${text}"`
- })
-});
+    const response = await fetch("https://gproxyserver.onrender.com/explain", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text })
+    });
 
     const data = await response.json();
-    console.log("📦 Gemini Response:", data);
+    console.log("📦 Groq Response:", data);
 
-    const output =
-      data.candidates?.[0]?.content?.parts?.[0]?.text || "loading ...";
-
-    return output;
+    return data.explanation || "⚠️ No explanation received";
   } catch (error) {
-    console.error("❌ Gemini API Error:", error);
-    return "❌ Error contacting Gemini API. Check console for details.";
+    console.error("❌ API Error:", error);
+    return "❌ Server error. Check console.";
   }
 }
 
