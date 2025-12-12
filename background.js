@@ -18,13 +18,10 @@ chrome.runtime.onInstalled.addListener(() =>{
 
 
 
-let pendingText = null;
-let pendingExplanation = null;
 
 
 async function callGeminiAPI(text) {
-  console.log("🤖 Calling Groq API with:", text);
-
+  console.log("Calling Gemini API with text:", text);
   try {
     const response = await fetch("https://gproxyserver.onrender.com/explain", {
       method: "POST",
@@ -33,68 +30,113 @@ async function callGeminiAPI(text) {
     });
 
     const data = await response.json();
-    console.log("📦 Groq Response:", data);
-
-    return data.explanation || "⚠️ No explanation received";
+    return data.explanation || "No explanation received";
   } catch (error) {
-    console.error("❌ API Error:", error);
-    return "❌ Server error. Check console.";
+    return "Server error";
   }
 }
 
+let pendingSelectedText = null;   
 
 
-chrome.contextMenus.onClicked.addListener(async(info, tab)=>{
-    if(info.menuItemId === "simplify-explain" ){
-       
-        const selectedText = info.selectionText;
+async function openPanelWindow(selectedText, tab) {
+  pendingSelectedText = selectedText;
 
-        if(selectedText){
-            console.log("Selected text:", selectedText);
-            pendingText = selectedText;
+  // Open side panel
+  await chrome.sidePanel.open({ windowId: tab.windowId });
 
-            await chrome.sidePanel.open({ windowId: tab.windowId });
+  // Send loading
+  chrome.runtime.sendMessage({
+    type: "EXPLANATION_RECEIVED",
+    data: "Simplifying"
+  });
 
-            chrome.runtime.sendMessage({
-               type: "EXPLANATION_RECEIVED",
-               data: "Simplifying"
-            });
+  // Call API
+  const explanation = await callGeminiAPI(selectedText);
 
-            pendingExplanation = "Simplifying";
-            const explanation = await callGeminiAPI(selectedText);
-            pendingExplanation = explanation;
+  // Send explanation
+  chrome.runtime.sendMessage({
+    type: "EXPLANATION_RECEIVED",
+    data: explanation
+  });
 
-            chrome.runtime.sendMessage({
-               type: "EXPLANATION_RECEIVED",
-               data: explanation
-           });
-        }else {
-            console.error("No text selected.");
-        }
-    }
-});
+  // Clear pending now that explanation is sent
+  pendingSelectedText = null;
+}
 
-chrome.runtime.onMessage.addListener(async(message, sender, sendResponse) => {
+
+// PANEL_READY handler (fires when panel loads)
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   if (message.type === "PANEL_READY") {
 
-    
-
-    if (pendingText) {
-       chrome.runtime.sendMessage({
+    if (pendingSelectedText !== null) {
+      chrome.runtime.sendMessage({
         type: "EXPLANATION_RECEIVED",
         data: "Simplifying"
       });
-      console.log("🤖 Calling API after panel ready");
-      const explanation = await callGeminiAPI(pendingText);
-      
+
+      const explanation = await callGeminiAPI(pendingSelectedText);
 
       chrome.runtime.sendMessage({
         type: "EXPLANATION_RECEIVED",
         data: explanation
       });
 
-      pendingText = null;
+      pendingSelectedText = null;
     }
+
     sendResponse({ status: "OK" });
   }
+});
+
+
+
+// CONTEXT MENU HANDLER
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+  if (info.menuItemId !== "simplify-explain") return;
+
+  const selectedText = info.selectionText;
+  if (!selectedText) return;
+
+  chrome.storage.sync.get("mode", async ({ mode = "panel" }) => {
+
+    // PANEL MODE --------------------------------
+    if (mode === "panel") {
+      return openPanelWindow(selectedText, tab);
+    }
+
+    // FLOAT MODE --------------------------------
+    if (mode === "floating") {
+      console.log("Floating mode selected");
+      try {
+        await chrome.tabs.sendMessage(tab.id, { type: "SHOW_LOADING" });
+      } catch (err) {
+        console.log("Injecting content script",err);
+        await chrome.scripting.insertCSS({
+          target: { tabId: tab.id },
+          files: ["content.css"]
+        });
+
+        await chrome.scripting.executeScript({
+         target: { tabId: tab.id },
+         files: ["marked.min.js"]
+        });
+
+
+        await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ["content.js"]
+        });
+
+        await chrome.tabs.sendMessage(tab.id, { type: "SHOW_LOADING" });
+      }
+
+      const explanation = await callGeminiAPI(selectedText);
+
+      chrome.tabs.sendMessage(tab.id, {
+        type: "SHOW_EXPLANATION",
+        text: explanation
+      });
+    }
+  });
 });

@@ -15,11 +15,13 @@
     "service_worker": "background.js"
   },
   
- 
+
   "permissions": [
     "contextMenus", 
     "sidePanel",
-    "activeTab"     
+    "activeTab"  ,
+    "scripting",
+    "storage"   
   ],
 
   
@@ -28,6 +30,6 @@
   },
 
   "host_permissions": [
-   "https://generativelanguage.googleapis.com/"
+    "<all_urls>"
   ]
 }
