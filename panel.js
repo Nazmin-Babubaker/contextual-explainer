@@ -2,8 +2,21 @@ chrome.runtime.sendMessage({ type: "PANEL_READY" });
 
 const explanationTextElement = document.getElementById('explanation-text');
 const loader = document.getElementById('loader');
+
+const modeToggle = document.getElementById("mode-toggle");
+const modeOptions = document.getElementById("mode-options");
+
+modeToggle.addEventListener("click", () => {
+  console.log("Mode button clicked!");
+
+  // toggle visibility
+  modeOptions.classList.toggle("hidden");
+});
+
 const radios = document.querySelectorAll('input[name="mode"]');
 const clearBtn = document.getElementById("clear");
+
+
 
 
 chrome.storage.sync.get("mode", ({ mode }) => {
@@ -13,11 +26,12 @@ chrome.storage.sync.get("mode", ({ mode }) => {
   if (radio) radio.checked = true;
 });
 
-radios.forEach((radio) => {
-  radio.addEventListener("change", () => {
-    chrome.storage.sync.set({ mode: radio.value }, () => {
-      console.log("Mode updated to:", radio.value);
-    });
+radios.forEach(r => {
+  r.addEventListener("change", () => {
+    console.log("[PANEL] Mode chosen:", r.value);
+
+    chrome.storage.sync.set({ mode: r.value });
+    modeOptions.classList.add("hidden");
   });
 });
 

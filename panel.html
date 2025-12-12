@@ -119,21 +119,54 @@
 .hidden {
   display: none !important;
 }
+
+#mode-container {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+}
+
+#mode-toggle {
+  background: #384464;
+  color: #f4f4f4;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#mode-options {
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  background: #f4f4f4;
+  color: #0e0d0d;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+}
+
+.mode-options {
+  
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mode-options.hidden {
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+}
+
+
   </style>
 
 </head>
 
 <body>
-  <h3>Explain Anywhere</h3>
 
-  <div class="mode">
-    <label><input type="radio" name="mode" value="panel"> Side Panel</label><br>
-    <label><input type="radio" name="mode" value="floating"> Floating Popup</label>
-  </div>
-
-  <div>
-    <button id="clear">Clear</button>
-  </div>
   <div id="explanation-container">
     <div id="e2"><h3>Explanation</h3></div>
 
@@ -143,6 +176,18 @@
       Select any text on the page, right-click, and choose 'Simplify Selection' to get an explanation here.
     </p>
   </div>
+
+  <div id="mode-container" >
+  <button id="mode-toggle"  class="icon-btn">
+    Mode
+  </button>
+
+  <div id="mode-options" class="mode-options hidden">
+    <label><input type="radio" name="mode" value="panel"> Side Panel</label><br>
+    <label><input type="radio" name="mode" value="floating"> Floating Popup</label>
+  </div>
+</div>
+
 
   <script src="marked.min.js"></script>
   <script src="panel.js"></script>
