@@ -20,6 +20,7 @@
     "contextMenus", 
     "sidePanel",
     "activeTab"  ,
+    "tabs",
     "scripting",
     "storage"   
   ],
