@@ -1,5 +1,4 @@
-# Contextual Explainer — Chrome Extension
-
+# <img src="pen-tablet.png" alt="Contextual Explainer" width="32" style="vertical-align: middle; margin-right: 8px;"> Contextual Explainer — Chrome Extension
 Contextual Explainer is a Chrome Extension that provides contextual explanations for text, code, or data right in your browser. Highlight any content on a web page and get instant, easy-to-understand explanations, summaries, or clarifications.
 
 It supports two display modes: Side Panel and Floating Popup, giving you flexibility to view explanations without interrupting your workflow.
