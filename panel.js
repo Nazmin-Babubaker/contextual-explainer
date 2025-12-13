@@ -1,20 +1,36 @@
 chrome.runtime.sendMessage({ type: "PANEL_READY" });
 
-const explanationTextElement = document.getElementById('explanation-text');
-const loader = document.getElementById('loader');
 
 const modeToggle = document.getElementById("mode-toggle");
 const modeOptions = document.getElementById("mode-options");
+const modeOverlay = document.getElementById("mode-overlay");
+const explanationTextElement = document.getElementById('explanation-text');
+const loader = document.getElementById('loader');
+const radios = document.querySelectorAll('input[name="mode"]');
 
-modeToggle.addEventListener("click", () => {
-  console.log("Mode button clicked!");
 
-  // toggle visibility
-  modeOptions.classList.toggle("hidden");
+modeToggle.addEventListener("click", (e) => {
+  e.stopPropagation(); 
+  const isOpen = modeOptions.classList.toggle("open");
+
+  modeToggle.classList.toggle("active", isOpen);
+  modeOverlay.classList.toggle("active", isOpen);
 });
 
-const radios = document.querySelectorAll('input[name="mode"]');
-const clearBtn = document.getElementById("clear");
+
+function closeDropdown() {
+  modeOptions.classList.remove("open");
+  modeToggle.classList.remove("active");
+  modeOverlay.classList.remove("active");
+}
+
+modeOverlay.addEventListener("click", () => {
+  closeDropdown();
+});
+
+modeOptions.addEventListener("click", (e) => {
+  e.stopPropagation();
+});
 
 
 
@@ -26,12 +42,23 @@ chrome.storage.sync.get("mode", ({ mode }) => {
   if (radio) radio.checked = true;
 });
 
+
 radios.forEach(r => {
-  r.addEventListener("change", () => {
+  r.addEventListener("change", (e) => {
     console.log("[PANEL] Mode chosen:", r.value);
+    
 
     chrome.storage.sync.set({ mode: r.value });
-    modeOptions.classList.add("hidden");
+    
+
+    closeDropdown();
+  });
+  
+
+  r.addEventListener("click", (e) => {
+    e.stopPropagation();
+
+    closeDropdown();
   });
 });
 
