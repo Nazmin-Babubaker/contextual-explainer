@@ -28,13 +28,35 @@
       box-shadow: 0 0 18px rgba(17, 2, 78, 0.25);
     }
 
-    #explanation-container h3 {
+    /* ================= Header ================= */
+
+    .explanation-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+    }
+
+    .explanation-header h3 {
+      margin: 0;
       font-weight: 700;
       font-size: 20px;
-      margin-bottom: 10px;
       letter-spacing: 1px;
       color: #e6e6e6;
     }
+
+    /* ================= Body ================= */
+
+    .explanation-body {
+      position: relative;
+      
+    }
+    
 
     p {
       font-size: 15px;
@@ -93,18 +115,11 @@
       display: none !important;
     }
 
-    /* ================= Mode Toggle Button ================= */
-
-    #mode-container {
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      z-index: 10001;
-    }
+    /* ================= Settings Button ================= */
 
     .icon-btn {
-      width: 42px;
-      height: 42px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       background: #1e1f2f;
       border: none;
@@ -113,6 +128,8 @@
       align-items: center;
       justify-content: center;
       box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      flex-shrink: 0;
+      z-index: 1001;
     }
 
     .icon-btn:hover {
@@ -120,8 +137,8 @@
     }
 
     .icon-btn img {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       transition: transform 0.35s ease;
     }
 
@@ -143,14 +160,14 @@
       box-shadow: -6px 0 24px rgba(0,0,0,0.25);
       transform: translateX(100%);
       transition: transform 0.3s ease;
-      z-index: 10000;
+      z-index: 1000;
     }
 
     #mode-options.open {
       transform: translateX(0);
     }
 
-    /* ================= Panel Header ================= */
+    /* ================= Mode Header ================= */
 
     .mode-header {
       margin-bottom: 16px;
@@ -206,13 +223,6 @@
 
 <body>
 
-  <!-- Fixed settings button -->
-  <div id="mode-container">
-    <button id="mode-toggle" class="icon-btn" title="Change display mode">
-      <img src="settings.png" alt="Settings">
-    </button>
-  </div>
-
   <!-- Sliding mode panel -->
   <div id="mode-options">
     <div class="mode-header">
@@ -237,14 +247,26 @@
     </label>
   </div>
 
-  <!-- Explanation content -->
+  <!-- Explanation card -->
+
+    <div class="explanation-header">
+      <h3>Explanation</h3>
+
+      <button id="mode-toggle" class="icon-btn" title="Change display mode">
+        <img src="settings.png" alt="Settings">
+      </button>
+    </div>
+
   <div id="explanation-container">
-    <h3>Explanation</h3>
-    <div id="loader" class="loader hidden"></div>
-    <p id="explanation-text">
-      Select any text on the page, right-click, and choose
-      <strong>Simplify Selection</strong> to get an explanation here.
-    </p>
+    <div class="explanation-body">
+      <div id="loader" class="loader hidden"></div>
+
+      <p id="explanation-text">
+        Select any text on the page, right-click, and choose
+        <strong>Simplify Selection</strong> to get an explanation here.
+      </p>
+    </div>
+
   </div>
 
   <script src="marked.min.js"></script>
