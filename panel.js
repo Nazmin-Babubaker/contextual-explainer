@@ -49,6 +49,12 @@ radios.forEach(r => {
     
 
     chrome.storage.sync.set({ mode: r.value });
+
+    if (r.value === "floating") {
+      chrome.runtime.sendMessage({
+        type: "MODE_CHANGED_TO_FLOATING"
+      });
+    }
     
 
     closeDropdown();
