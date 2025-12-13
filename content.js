@@ -2,6 +2,9 @@
 let popup = null;
 let closeListenerAdded = false;
 
+
+
+
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.type === "SHOW_LOADING") {
     showPopup("⏳ Simplifying...", true);
