@@ -33,7 +33,7 @@ async function callGeminiAPI(text) {
     const data = await response.json();
     return data.explanation || "No explanation received";
   } catch (error) {
-    return "Server error";
+    return "Server error, maybe the proxy is suspended now";
   }
 }
 
@@ -51,7 +51,7 @@ async function shortExplain(text) {
     const data = await response.json();
     return data.explanation || "No explanation received";
   } catch (error) {
-    return "Server error";
+    return "Server error, maybe the proxy is suspended now";
   }
 }
 
