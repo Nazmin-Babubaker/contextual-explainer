@@ -8,11 +8,8 @@ const modeOptions = document.getElementById("mode-options");
 
 modeToggle.addEventListener("click", () => {
   console.log("Mode button clicked!");
-
-  // toggle visibility
-  modeOptions.classList.toggle("hidden");
-    modeToggle.classList.toggle("active");
-
+const isOpen = modeOptions.classList.toggle("open");
+  modeToggle.classList.toggle("active", isOpen);
 });
 
 const radios = document.querySelectorAll('input[name="mode"]');
@@ -33,7 +30,8 @@ radios.forEach(r => {
     console.log("[PANEL] Mode chosen:", r.value);
 
     chrome.storage.sync.set({ mode: r.value });
-    modeOptions.classList.add("hidden");
+    modeOptions.classList.remove("open");
+    modeToggle.classList.remove("active");
   });
 });
 

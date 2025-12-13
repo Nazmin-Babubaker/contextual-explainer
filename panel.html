@@ -12,6 +12,8 @@
       color: #e6e6e6;
     }
 
+    /* ================= Explanation Panel ================= */
+
     #explanation-container {
       padding: 18px;
       border-radius: 14px;
@@ -27,21 +29,11 @@
     }
 
     #explanation-container h3 {
-     font-family:sans-serif;
-     font-weight: 700;  
-     font-size: 20px;
-     margin-bottom: 10px;
-     letter-spacing: 1px;
-     color: #e6e6e6;  
-    }
-    
-   
-
-    h1, h2, h3 {
-      color: #cfcfcf;
-      margin: 0 0 12px 0;
-      font-weight: 600;
-      letter-spacing: 0.4px;
+      font-weight: 700;
+      font-size: 20px;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+      color: #e6e6e6;
     }
 
     p {
@@ -51,172 +43,209 @@
       margin: 8px 0;
     }
 
-    ul {
-      padding-left: 18px;
+    /* ================= Loader ================= */
+
+    #loader {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 25px auto;
     }
 
-    li {
-      margin: 6px 0;
+    .loader {
+      width: 40px;
+      aspect-ratio: 1;
+      position: relative;
     }
 
-    strong {
-      color: #ffffff;
+    .loader:before,
+    .loader:after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      margin: -8px 0 0 -8px;
+      width: 16px;
+      aspect-ratio: 1;
+      background: #55b7d2;
+      animation: l2-1 2s infinite, l2-2 1s infinite;
+    }
+
+    .loader:after {
+      background: #d01e59;
+      animation-delay: -1s, 0s;
+    }
+
+    @keyframes l2-1 {
+      0% { top: 0; left: 0; }
+      25% { top: 100%; left: 0; }
+      50% { top: 100%; left: 100%; }
+      75% { top: 0; left: 100%; }
+      100% { top: 0; left: 0; }
+    }
+
+    @keyframes l2-2 {
+      40%, 50% { transform: rotate(0.25turn) scale(0.5); }
+      100% { transform: rotate(0.5turn) scale(1); }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ================= Mode Toggle Button ================= */
+
+    #mode-container {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 10001;
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #1e1f2f;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+
+    .icon-btn:hover {
+      background: #3a3f65;
+    }
+
+    .icon-btn img {
+      width: 20px;
+      height: 20px;
+      transition: transform 0.35s ease;
+    }
+
+    .icon-btn.active img {
+      transform: rotate(90deg);
+    }
+
+    /* ================= Slide Panel ================= */
+
+    #mode-options {
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: 260px;
+      padding: 20px;
+      background: #ffffff;
+      color: #111;
+      box-shadow: -6px 0 24px rgba(0,0,0,0.25);
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 10000;
+    }
+
+    #mode-options.open {
+      transform: translateX(0);
+    }
+
+    /* ================= Panel Header ================= */
+
+    .mode-header {
+      margin-bottom: 16px;
+      border-bottom: 1px solid #e5e5e5;
+      padding-bottom: 12px;
+    }
+
+    .mode-header h3 {
+      margin: 0;
+      font-size: 16px;
       font-weight: 600;
+      color: #222;
     }
 
-    em {
-      color: #e19bff;
+    .mode-header p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: #666;
     }
 
-  #loader {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 25px auto;
-}
+    /* ================= Mode Cards ================= */
 
+    .mode-card {
+      display: flex;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
 
-.loader {
-  width: 40px;
-  aspect-ratio: 1;
-  position: relative;
-}
+    .mode-card:hover {
+      background: #f6f7f9;
+    }
 
-.loader:before,
-.loader:after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin: -8px 0 0 -8px;
-  width: 16px;
-  aspect-ratio: 1;
-  background: #55b7d2;
-  animation:
-    l2-1 2s infinite,
-    l2-2 1s infinite;
-}
+    .mode-card input {
+      margin-top: 4px;
+    }
 
-.loader:after {
-  background: #d01e59;
-  animation-delay: -1s, 0s;
-}
+    .mode-card strong {
+      display: block;
+      font-size: 14px;
+      color: #111;
+    }
 
-@keyframes l2-1 {
-  0%   { top: 0;   left: 0; }
-  25%  { top: 100%; left: 0; }
-  50%  { top: 100%; left: 100%; }
-  75%  { top: 0;   left: 100%; }
-  100% { top: 0;   left: 0; }
-}
-
-@keyframes l2-2 {
-  40%,50% { transform: rotate(0.25turn) scale(0.5); }
-  100%    { transform: rotate(0.5turn) scale(1); }
-}
-
-.hidden {
-  display: none !important;
-}
-
-#mode-container {
- position: fixed;
-  bottom: 16px;
-  right: 16px;
-  z-index: 9999;
-}
-
-
-#mode-toggle {
-  background: #384464;
-  color: #f4f4f4;
-  padding: 8px 12px;
-  border-radius: 100px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-#mode-options {
-
-  position: absolute;
-  bottom: 48px;   
-  right: 0;
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: #ffffff;
-  color: #111;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-  min-width: 160px;
-}
-
-.mode-options {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.mode-options.hidden {
-  opacity: 0;
-  transform: translateY(8px);
-  pointer-events: none;
-}
-
-.icon-btn {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: #1e1f2f;
-  border: 2px solid #1e1f2f;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-
-}
-
-
-
-.icon-btn img {
-  width: 20px;
-  height: 20px;
-  transition: transform 0.35s ease;
-
-}
-
-.icon-btn.active img {
-  transform: rotate(90deg);
-}
-
+    .mode-card span {
+      font-size: 12px;
+      color: #555;
+    }
   </style>
-
 </head>
 
 <body>
 
-  <div id="mode-container" >
-  <button id="mode-toggle" class="icon-btn" title="Change display mode">
-  <img src="settings.png" alt="Mode" />
-</button>
-
-  <div id="mode-options" class="mode-options hidden">
-    <label><input type="radio" name="mode" value="panel"> Side Panel</label><br>
-    <label><input type="radio" name="mode" value="floating"> Floating Popup</label>
+  <!-- Fixed settings button -->
+  <div id="mode-container">
+    <button id="mode-toggle" class="icon-btn" title="Change display mode">
+      <img src="settings.png" alt="Settings">
+    </button>
   </div>
 
-</div>
+  <!-- Sliding mode panel -->
+  <div id="mode-options">
+    <div class="mode-header">
+      <h3>Display Mode</h3>
+      <p>Choose how explanations appear</p>
+    </div>
+
+    <label class="mode-card">
+      <input type="radio" name="mode" value="panel">
+      <div>
+        <strong>Side Panel</strong>
+        <span>Fixed panel on the right</span>
+      </div>
+    </label>
+
+    <label class="mode-card">
+      <input type="radio" name="mode" value="floating">
+      <div>
+        <strong>Floating Popup</strong>
+        <span>Small movable popup</span>
+      </div>
+    </label>
+  </div>
+
+  <!-- Explanation content -->
   <div id="explanation-container">
-    <div id="e2"><h3>Explanation</h3></div>
-
+    <h3>Explanation</h3>
     <div id="loader" class="loader hidden"></div>
-
     <p id="explanation-text">
-      Select any text on the page, right-click, and choose 'Simplify Selection' to get an explanation here.
+      Select any text on the page, right-click, and choose
+      <strong>Simplify Selection</strong> to get an explanation here.
     </p>
   </div>
-
-  
-
 
   <script src="marked.min.js"></script>
   <script src="panel.js"></script>
