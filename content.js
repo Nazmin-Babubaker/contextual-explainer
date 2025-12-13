@@ -27,8 +27,20 @@ function showPopup(message, isLoading) {
   });
 
   popup.innerHTML = isLoading
-    ? `<span class="loader" aria-hidden="true"></span> Processing...`
+    ? `<span class="loader" aria-hidden="true"></span>`
     : marked.parse(message);
+
+  if (!isLoading) {
+    const closeBtn = document.createElement("button");
+    closeBtn.textContent = "×";
+    closeBtn.className = "popup-close-btn";
+    closeBtn.title = "Close";
+    closeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      removePopup();
+    });
+    popup.appendChild(closeBtn);
+  }
 
   const sel = window.getSelection();
   if (!sel || !sel.rangeCount) {
@@ -46,6 +58,11 @@ function showPopup(message, isLoading) {
       popup.style.left = window.scrollX + 20 + "px";
     }
   }
+
+  
+
+    makeDraggable(popup);
+
 
   document.body.appendChild(popup);
 
@@ -80,4 +97,43 @@ function removePopup() {
     closeListenerAdded = false;
   }
 }
+
+
+function makeDraggable(el) {
+  let isDragging = false;
+  let startX, startY, origX, origY;
+
+  el.style.position = "absolute"; // ensure it's absolutely positioned
+
+  el.addEventListener("mousedown", (e) => {
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    origX = parseInt(el.style.left, 10);
+    origY = parseInt(el.style.top, 10);
+
+    // Bring to front while dragging
+    el.style.zIndex = 9999;
+
+    e.preventDefault();
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
+
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    el.style.left = origX + dx + "px";
+    el.style.top = origY + dy + "px";
+  });
+
+  document.addEventListener("mouseup", () => {
+    if (isDragging) {
+      isDragging = false;
+      el.style.zIndex = 1000; // reset z-index
+    }
+  });
+}
+
 

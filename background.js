@@ -36,6 +36,25 @@ async function callGeminiAPI(text) {
   }
 }
 
+
+
+async function shortExplain(text) {
+  console.log("Calling Gemini API with text:", text);
+  try {
+    const response = await fetch(" https://gproxyserver.onrender.com/shortexplain", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text })
+    });
+
+    const data = await response.json();
+    return data.explanation || "No explanation received";
+  } catch (error) {
+    return "Server error";
+  }
+}
+
+
 let pendingSelectedText = null;   
 
 
@@ -131,7 +150,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         await chrome.tabs.sendMessage(tab.id, { type: "SHOW_LOADING" });
       }
 
-      const explanation = await callGeminiAPI(selectedText);
+      const explanation = await shortExplain(selectedText);
 
       chrome.tabs.sendMessage(tab.id, {
         type: "SHOW_EXPLANATION",
