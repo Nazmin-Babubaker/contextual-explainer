@@ -59,6 +59,11 @@ cd contextual-explainer
 
 ---
 
+## ⚠️ Rate limits
+
+A small note: API requests are rate limited — 100 requests per day and 10 requests per minute. If you exceed these limits, requests may be rejected until the limit window resets.
+
+
 ## ⚙️ Permissions Used
 - contextMenus — to add the “Simplify & Explain” option
 - sidePanel API — to display explanations in Chrome’s panel
