@@ -11,6 +11,8 @@ modeToggle.addEventListener("click", () => {
 
   // toggle visibility
   modeOptions.classList.toggle("hidden");
+    modeToggle.classList.toggle("active");
+
 });
 
 const radios = document.querySelectorAll('input[name="mode"]');

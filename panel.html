@@ -120,18 +120,18 @@
 }
 
 #mode-container {
-  position: fixed;
-  bottom: 10px;
-  width: 100%;
-  text-align: center;
+ position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 9999;
 }
+
 
 #mode-toggle {
   background: #384464;
   color: #f4f4f4;
-  border: none;
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: 100px;
   cursor: pointer;
   font-size: 14px;
 }
@@ -139,9 +139,8 @@
 #mode-options {
 
   position: absolute;
-  bottom: 50px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 48px;   
+  right: 0;
   padding: 10px 14px;
   border-radius: 10px;
   background: #ffffff;
@@ -151,18 +150,43 @@
 }
 
 .mode-options {
-  
-  transition: opacity 0.25s ease, transform 0.25s ease;
   opacity: 1;
   transform: translateY(0);
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .mode-options.hidden {
   opacity: 0;
-  transform: translateY(-6px);
+  transform: translateY(8px);
   pointer-events: none;
 }
 
+.icon-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #1e1f2f;
+  border: 2px solid #1e1f2f;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+
+}
+
+
+
+.icon-btn img {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.35s ease;
+
+}
+
+.icon-btn.active img {
+  transform: rotate(90deg);
+}
 
   </style>
 
@@ -170,6 +194,17 @@
 
 <body>
 
+  <div id="mode-container" >
+  <button id="mode-toggle" class="icon-btn" title="Change display mode">
+  <img src="settings.png" alt="Mode" />
+</button>
+
+  <div id="mode-options" class="mode-options hidden">
+    <label><input type="radio" name="mode" value="panel"> Side Panel</label><br>
+    <label><input type="radio" name="mode" value="floating"> Floating Popup</label>
+  </div>
+
+</div>
   <div id="explanation-container">
     <div id="e2"><h3>Explanation</h3></div>
 
@@ -180,16 +215,7 @@
     </p>
   </div>
 
-  <div id="mode-container" >
-  <button id="mode-toggle"  class="icon-btn">
-    Mode
-  </button>
-
-  <div id="mode-options" class="mode-options hidden">
-    <label><input type="radio" name="mode" value="panel"> Side Panel</label><br>
-    <label><input type="radio" name="mode" value="floating"> Floating Popup</label>
-  </div>
-</div>
+  
 
 
   <script src="marked.min.js"></script>
