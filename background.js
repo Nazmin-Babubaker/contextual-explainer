@@ -1,10 +1,16 @@
+let pendingSelectedText = null;  
+let pendingExplanation = null;
+let lastSelectedText = null;
+
+
+
 chrome.runtime.onInstalled.addListener(() =>{
     chrome.contextMenus.create({
         id: "simplify-explain",
         title: "Simplify & Explain",
         contexts: ["selection"]
     },() => {
-        if (chrome.runtime.lastError) {
+        if (chrome.runtime.lastError){
                 console.error("Context Menu Error:", chrome.runtime.lastError.message);
         }
     });
@@ -17,18 +23,18 @@ chrome.runtime.onInstalled.addListener(() =>{
 });
 
 
-let lastSelectedText = null;
 
 
 
-async function callGeminiAPI(text) {
+async function callGeminiAPI(text){
   console.log("Calling Gemini API with text:", text);
   try {
     const response = await fetch("https://gproxyserver.onrender.com/explain", {
-      method: "POST",
+      method: "POST", 
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text })
     });
+
 
     const data = await response.json();
     return data.explanation || "No explanation received";
@@ -39,7 +45,7 @@ async function callGeminiAPI(text) {
 
 
 
-async function shortExplain(text) {
+async function shortExplain(text){
   console.log("Calling Gemini API with text:", text);
   try {
     const response = await fetch(" https://gproxyserver.onrender.com/shortexplain", {
@@ -48,6 +54,7 @@ async function shortExplain(text) {
       body: JSON.stringify({ text })
     });
 
+
     const data = await response.json();
     return data.explanation || "No explanation received";
   } catch (error) {
@@ -56,60 +63,118 @@ async function shortExplain(text) {
 }
 
 
-let pendingSelectedText = null;   
 
 
-async function openPanelWindow(selectedText, tab) {
+async function openPanelWindow(selectedText, tab){
+
   pendingSelectedText = selectedText;
+  await chrome.sidePanel.open({ windowId: tab.windowId })
+  .catch((error) => {
+        console.error("Error opening side panel:", error);
+      });
 
-  // Open side panel
-  await chrome.sidePanel.open({ windowId: tab.windowId });
-
-  // Send loading
   chrome.runtime.sendMessage({
     type: "EXPLANATION_RECEIVED",
     data: "Simplifying"
+  })
+  .catch((err)=>{
+        console.log("Error sending loading message:", err);
   });
 
-  // Call API
+
   const explanation = await callGeminiAPI(selectedText);
 
-  // Send explanation
-  chrome.runtime.sendMessage({
+  
+   chrome.runtime.sendMessage({
     type: "EXPLANATION_RECEIVED",
     data: explanation
-  });
+  })
+  .catch((err)=>{
+    pendingExplanation = explanation;
+    console.log("Error sending explanation message:", err);
+});
 
-  // Clear pending now that explanation is sent
-  pendingSelectedText = null;
 }
 
+async function ensureContentAndExplain(tabId, text) {
+  // 1. Ensure content script is ready
+  try {
+    await chrome.tabs.sendMessage(tabId, { type: "SHOW_LOADING" });
+  } catch (err) {
+    console.log("Content script not found, injecting…", err);
 
-// PANEL_READY handler (fires when panel loads)
-chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-  if (message.type === "PANEL_READY") {
+    //  await chrome.scripting.insertCSS({
+    //   target: { tabId },
+    //   files: ["content.css"]
+    // });
 
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      files: ["marked.min.js"]
+    });
+
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      files: ["content.js"]
+    });
 
     
 
+    // retry after injection
+    await chrome.tabs.sendMessage(tabId, { type: "SHOW_LOADING" });
+  }
+
+  // 2. Get explanation
+  const explanation = await shortExplain(text);
+
+  // 3. Send explanation
+  chrome.tabs.sendMessage(tabId, {
+    type: "SHOW_EXPLANATION",
+    text: explanation
+  });
+}
+
+
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+  if (message.type === "PANEL_READY") {    
+
     if (pendingSelectedText !== null) {
-      chrome.runtime.sendMessage({
+      
+
+      if (pendingExplanation !== null) {
+
+        chrome.runtime.sendMessage({
+          type: "EXPLANATION_RECEIVED",
+          data: pendingExplanation
+        });
+      }else{
+        chrome.runtime.sendMessage({
         type: "EXPLANATION_RECEIVED",
         data: "Simplifying"
       });
-
-      const explanation = await callGeminiAPI(pendingSelectedText);
-
-      chrome.runtime.sendMessage({
-        type: "EXPLANATION_RECEIVED",
-        data: explanation
-      });
-
-      pendingSelectedText = null;
-    }
-
-    sendResponse({ status: "OK" });
+      }
+      pendingSelectedText = null;       
+    }   
   }
+
+  if (message.type === "MODE_CHANGED_TO_FLOATING") {
+    if (!lastSelectedText) return;
+
+    console.log("[BG] Switching panel → floating");
+
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      lastFocusedWindow: true
+    });
+
+    if (!tab) return;
+
+    chrome.sidePanel.close({ windowId: tab.windowId });
+
+    await ensureContentAndExplain(tab.id, lastSelectedText);
+  }
+    
+  
 });
 
 
@@ -126,7 +191,6 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
   chrome.storage.sync.get("mode", async ({ mode = "panel" }) => {
 
-    // PANEL MODE --------------------------------
     if (mode === "panel") {
       return openPanelWindow(selectedText, tab);
     }
@@ -134,83 +198,11 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     // FLOAT MODE --------------------------------
     if (mode === "floating") {
       console.log("Floating mode selected");
-      try {
-        await chrome.tabs.sendMessage(tab.id, { type: "SHOW_LOADING" });
-      } catch (err) {
-        console.log("Injecting content script",err);
-        await chrome.scripting.insertCSS({
-          target: { tabId: tab.id },
-          files: ["content.css"]
-        });
-
-        await chrome.scripting.executeScript({
-         target: { tabId: tab.id },
-         files: ["marked.min.js"]
-        });
-
-
-        await chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          files: ["content.js"]
-        });
-
-        await chrome.tabs.sendMessage(tab.id, { type: "SHOW_LOADING" });
-      }
-
-      const explanation = await shortExplain(selectedText);
-
-      chrome.tabs.sendMessage(tab.id, {
-        type: "SHOW_EXPLANATION",
-        text: explanation
-      });
+      await ensureContentAndExplain(tab.id, selectedText);
     }
   });
 });
 
 
-chrome.runtime.onMessage.addListener(async (message) => {
-  if (message.type === "MODE_CHANGED_TO_FLOATING") {
-    if (!lastSelectedText) return;
-
-    console.log("[BG] Switching panel → floating");
-
-    const [tab] = await chrome.tabs.query({
-      active: true,
-      lastFocusedWindow: true
-    });
-
-    if (!tab) return;
-
-    chrome.sidePanel.close({ windowId: tab.windowId });
-
-    try {
-      await chrome.tabs.sendMessage(tab.id, { type: "SHOW_LOADING" });
-    } catch {
-      await chrome.scripting.insertCSS({
-        target: { tabId: tab.id },
-        files: ["content.css"]
-      });
-
-      await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        files: ["marked.min.js"]
-      });
-
-      await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        files: ["content.js"]
-      });
-
-      await chrome.tabs.sendMessage(tab.id, { type: "SHOW_LOADING" });
-    }
-
-    const explanation = await shortExplain(lastSelectedText);
-
-    chrome.tabs.sendMessage(tab.id, {
-      type: "SHOW_EXPLANATION",
-      text: explanation
-    });
-  }
-});
 
 
