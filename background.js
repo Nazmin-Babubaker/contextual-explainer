@@ -90,18 +90,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   if (message.type === "PANEL_READY") {
 
 
-    const [tab] = await chrome.tabs.query({
-      active: true,
-      lastFocusedWindow: true
-    });
-
-    if (!tab) return;
-
-    // Inject click listener if not already injected
-    await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      files: ["panelClickListener.js"]
-    });
+    
 
     if (pendingSelectedText !== null) {
       chrome.runtime.sendMessage({
@@ -225,15 +214,3 @@ chrome.runtime.onMessage.addListener(async (message) => {
 });
 
 
-chrome.runtime.onMessage.addListener(async (message) => {
-  if (message.type === "OUTSIDE_CLICK") {
-    const [tab] = await chrome.tabs.query({
-      active: true,
-      lastFocusedWindow: true
-    });
-
-    if (!tab) return;
-
-    chrome.sidePanel.close({ windowId: tab.windowId });
-  }
-});

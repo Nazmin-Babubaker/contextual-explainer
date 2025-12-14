@@ -46,6 +46,7 @@ function showPopup(message, isLoading) {
   }
 
   const sel = window.getSelection();
+  
   if (!sel || !sel.rangeCount) {
     console.warn("[content] no selection to position popup");
     popup.style.top = window.scrollY + 20 + "px";
