@@ -1,9 +1,8 @@
-// content.js — improved click-to-close + debug
+
 let popup = null;
+let host = null;
+let shadow = null;
 let closeListenerAdded = false;
-
-
-
 
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.type === "SHOW_LOADING") {
@@ -15,22 +14,84 @@ chrome.runtime.onMessage.addListener((msg) => {
   }
 });
 
-function showPopup(message, isLoading) {
-  // Remove old popup if any
-  removePopup();
+function createShadowHost() {
+  if (host) return;
 
-  // Create popup
+  host = document.createElement("div");
+  host.id = "explain-shadow-host";
+  document.body.appendChild(host);
+
+  shadow = host.attachShadow({ mode: "open" });
+
+  // Inject CSS inside shadow root
+  const style = document.createElement("style");
+  style.textContent = `
+    .explain-popup {
+      position: absolute;
+      max-width: 300px;
+      background: #12182b;
+      color: rgba(247, 241, 241, 0.79);
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      z-index: 999999;
+      cursor: grab;
+    }
+
+    .explain-popup:active {
+      cursor: grabbing;
+    }
+
+    .loader {
+      border: 3px solid #eee;
+      border-top: 3px solid #555;
+      border-radius: 50%;
+      width: 14px;
+      height: 14px;
+      display: inline-block;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    .popup-close-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 14px;
+      height: 14px;
+      border: none;
+      background: transparent;
+      color: #f7f4f4a7;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1001;
+    }
+  `;
+
+  shadow.appendChild(style);
+}
+
+function showPopup(message, isLoading) {
+  removePopup();
+  createShadowHost();
+
   popup = document.createElement("div");
   popup.className = "explain-popup";
   popup.setAttribute("role", "dialog");
   popup.setAttribute("aria-live", "polite");
 
-  popup.addEventListener("click", (e) => {
-    e.stopPropagation();
-  });
+  popup.addEventListener("click", (e) => e.stopPropagation());
 
   popup.innerHTML = isLoading
-    ? `<span class="loader" aria-hidden="true"></span>`
+    ? `<span class="loader"></span>`
     : marked.parse(message);
 
   if (!isLoading) {
@@ -45,47 +106,41 @@ function showPopup(message, isLoading) {
     popup.appendChild(closeBtn);
   }
 
+  positionPopup(popup);
+  makeDraggable(popup);
+
+  shadow.appendChild(popup);
+  enableCloseOnClick();
+}
+
+function positionPopup(popup) {
   const sel = window.getSelection();
-  
+
   if (!sel || !sel.rangeCount) {
-    console.warn("[content] no selection to position popup");
     popup.style.top = window.scrollY + 20 + "px";
     popup.style.left = window.scrollX + 20 + "px";
-  } else {
-    try {
-      const rect = sel.getRangeAt(0).getBoundingClientRect();
-      popup.style.top = window.scrollY + Math.max(rect.top - 60, 8) + "px";
-      popup.style.left = window.scrollX + Math.max(rect.left, 8) + "px";
-    } catch (err) {
-      console.warn("[content] error getting range rect", err);
-      popup.style.top = window.scrollY + 20 + "px";
-      popup.style.left = window.scrollX + 20 + "px";
-    }
+    return;
   }
 
-  
-
-    makeDraggable(popup);
-
-
-  document.body.appendChild(popup);
-
-  popup.style.pointerEvents = "auto";
-
-  enableCloseOnClick();
+  try {
+    const rect = sel.getRangeAt(0).getBoundingClientRect();
+    popup.style.top = window.scrollY + Math.max(rect.top - 60, 8) + "px";
+    popup.style.left = window.scrollX + Math.max(rect.left, 8) + "px";
+  } catch {
+    popup.style.top = window.scrollY + 20 + "px";
+    popup.style.left = window.scrollX + 20 + "px";
+  }
 }
 
 function enableCloseOnClick() {
   if (closeListenerAdded) return;
   closeListenerAdded = true;
-
   document.addEventListener("click", handleClickOutside, false);
 }
 
-function handleClickOutside(event) {
+function handleClickOutside(e) {
   if (!popup) return;
-
-  if (!popup.contains(event.target)) {
+  if (!host.contains(e.target)) {
     removePopup();
   }
 }
@@ -96,18 +151,23 @@ function removePopup() {
     popup = null;
   }
 
+  if (host) {
+    host.remove();
+    host = null;
+    shadow = null;
+  }
+
   if (closeListenerAdded) {
     document.removeEventListener("click", handleClickOutside, false);
     closeListenerAdded = false;
   }
 }
 
-
 function makeDraggable(el) {
   let isDragging = false;
   let startX, startY, origX, origY;
 
-  el.style.position = "absolute"; // ensure it's absolutely positioned
+  el.style.position = "absolute";
 
   el.addEventListener("mousedown", (e) => {
     isDragging = true;
@@ -115,29 +175,18 @@ function makeDraggable(el) {
     startY = e.clientY;
     origX = parseInt(el.style.left, 10);
     origY = parseInt(el.style.top, 10);
-
-    // Bring to front while dragging
     el.style.zIndex = 9999;
-
     e.preventDefault();
   });
 
   document.addEventListener("mousemove", (e) => {
     if (!isDragging) return;
-
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-
-    el.style.left = origX + dx + "px";
-    el.style.top = origY + dy + "px";
+    el.style.left = origX + (e.clientX - startX) + "px";
+    el.style.top = origY + (e.clientY - startY) + "px";
   });
 
   document.addEventListener("mouseup", () => {
-    if (isDragging) {
-      isDragging = false;
-      el.style.zIndex = 1000; // reset z-index
-    }
+    isDragging = false;
+    el.style.zIndex = 1000;
   });
 }
-
-

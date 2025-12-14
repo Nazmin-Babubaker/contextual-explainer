@@ -97,16 +97,11 @@ async function openPanelWindow(selectedText, tab){
 }
 
 async function ensureContentAndExplain(tabId, text) {
-  // 1. Ensure content script is ready
+
   try {
     await chrome.tabs.sendMessage(tabId, { type: "SHOW_LOADING" });
   } catch (err) {
     console.log("Content script not found, injecting…", err);
-
-    //  await chrome.scripting.insertCSS({
-    //   target: { tabId },
-    //   files: ["content.css"]
-    // });
 
     await chrome.scripting.executeScript({
       target: { tabId },
@@ -120,7 +115,6 @@ async function ensureContentAndExplain(tabId, text) {
 
     
 
-    // retry after injection
     await chrome.tabs.sendMessage(tabId, { type: "SHOW_LOADING" });
   }
 
