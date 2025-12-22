@@ -7,6 +7,11 @@ const modeOverlay = document.getElementById("mode-overlay");
 const explanationTextElement = document.getElementById('explanation-text');
 const loader = document.getElementById('loader');
 const radios = document.querySelectorAll('input[name="mode"]');
+const landingPage = document.getElementById("landing-page");
+const container = document.getElementById("explanation-container");
+const landingTitle = document.getElementById("landing-title");
+const landingText = document.getElementById("landing-text");
+const landingHint = document.getElementById("landing-hint");
 
 
 modeToggle.addEventListener("click", (e) => {
@@ -16,6 +21,14 @@ modeToggle.addEventListener("click", (e) => {
   modeToggle.classList.toggle("active", isOpen);
   modeOverlay.classList.toggle("active", isOpen);
 });
+
+
+
+function animateLanding() {
+  landingTitle.classList.add("animate-title");
+  landingText.classList.add("animate-text");
+  landingHint.classList.add("animate-hint");
+}
 
 
 function closeDropdown() {
@@ -33,7 +46,9 @@ modeOptions.addEventListener("click", (e) => {
 });
 
 
-
+window.addEventListener("DOMContentLoaded", () => {
+  animateLanding();
+});
 
 chrome.storage.sync.get("mode", ({ mode }) => {
   const savedMode = mode || "panel"; // default
@@ -71,6 +86,9 @@ radios.forEach(r => {
 
 
 function showLoader() {
+
+    landingPage.classList.add("hidden");
+    container.classList.remove("hidden");
   loader.classList.remove("hidden");
   explanationTextElement.innerHTML = "";  
 }
@@ -81,6 +99,10 @@ function hideLoader() {
 
 function displayExplanation(text) {
   hideLoader();
+
+    landingPage.classList.add("hidden");
+    container.classList.remove("hidden");
+
   const html = marked.parse(text);
   explanationTextElement.innerHTML = html;
 }
