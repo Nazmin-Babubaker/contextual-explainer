@@ -11,7 +11,6 @@ const landingPage = document.getElementById("landing-page");
 const container = document.getElementById("explanation-container");
 const landingTitle = document.getElementById("landing-title");
 const landingText = document.getElementById("landing-text");
-const landingHint = document.getElementById("landing-hint");
 
 
 modeToggle.addEventListener("click", (e) => {
@@ -27,7 +26,6 @@ modeToggle.addEventListener("click", (e) => {
 function animateLanding() {
   landingTitle.classList.add("animate-title");
   landingText.classList.add("animate-text");
-  landingHint.classList.add("animate-hint");
 }
 
 
